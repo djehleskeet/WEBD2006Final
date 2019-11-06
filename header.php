@@ -26,17 +26,17 @@
                         <span class="sr-only">(current)</span>
                         </a>
                     </li>
-                    <?php if (!isset($_SESSION)): ?>
+                    <?php if (!isset($_SESSION['loggedin'])): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="login.php">Login</a>
                     </li>
-                    <?php endif ?>
                     <li class="nav-item">
                         <a class="nav-link" href="register.php">Register</a>
                     </li>
-                    <?php if (isset($_SESSION)): ?>
+                    <?php endif ?>
+                    <?php if (isset($_SESSION['loggedin'])): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="create.php">Create</a>
+                            <a class="nav-link" href="create.php">Write a review</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="logout.php">Log out</a>

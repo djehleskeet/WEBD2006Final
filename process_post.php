@@ -40,9 +40,23 @@
 
                 $query = "SELECT userid FROM users where username = :username";
                 $values = $db->prepare($query);
-                $values->bindValue(':username', $_SESSION['username']);
-                $value->execute();
+                $values->bindValue(':username', $_SESSION['user']['name']);
+                $values->execute();
                 $row = $values->fetch();
+
+                if(!isset($_FILES['image']))
+                {
+                    $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                    $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                    $genre =  filter_input(INPUT_POST, 'genre', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                    $query = "INSERT INTO posts (userid, title, description, genre) values (:userid, :title, :description, :genre)";
+                    $statement = $db->prepare($query);
+                    $statement->bindValue(':userid', $_SESSION['userid']);
+                    $statement->bindValue(':title', $title);
+                    $statement->bindValue(':description', $description);
+                    $statement->bindValue(':genre', $genre);
+                    $statement->execute();
+                }
 
                 header('Location: index.php');
 
@@ -59,16 +73,21 @@
             {
                 $name         = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 $password     = $_POST['password'];
-                $query = "SELECT username, password FROM users WHERE username = (:user)";
+                $query = "SELECT username, password FROM users WHERE username = (:name)";
                 $values = $db->prepare($query);
-                $values->bindValue(':user', $name);
+                $values->bindValue(':name', $name);
                 $values->execute();
                 $row = $values->fetch();
                 if($name == $row['username'] && password_verify($password, $row['password']))
                 {
-                    $_SESSION['user'] = [ 'name' => $name, 'password' => $password ];
+                    $_SESSION['username'] = $name;
+                    $_SESSION['loggedin'] = true;
+                    header('Location: index.php');
                 }
-                header('Location: index.php');
+                else
+                {
+                    $error = true;
+                }
             }
         }
 
@@ -95,23 +114,56 @@
             }
         }
 
+        if($_POST['command'] == 'Update')
+        {
+            if (filter_var($_POST['action'], FILTER_VALIDATE_INT))
+            {
+                if(!empty(trim($_POST['title'])) && !empty(trim($_POST['description'])))
+                {
+                    $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                    $content = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                    $id = $_POST['action'];
+
+                    $query = "UPDATE posts SET title = :title, description = :description WHERE id = :id";
+                    $statement = $db->prepare($query);
+                    $statement->bindValue(':title', $title);        
+                    $statement->bindValue(':content', $content);
+                    $statement->bindValue(':id', $id, PDO::PARAM_INT);
+                    
+                    $statement->execute();
+                    header('Location: index.php');
+                }
+                else
+                {
+                    $error = true;
+                }
+            } else{
+                header('Location: index.php');
+            }
+        }
+
         if($_POST['command'] == 'Register')
         {
             if (!empty($_POST['username']) || (!empty($_POST['password'])))
             {
                 $name = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-                $password = $_POST['password'];
-                if(!isset($_POST['username'], $_POST['password']))
+                $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+                if(!isset($_POST['username'], $_POST['password'], $_POST['email']))
                 {
-                    header('Location: register.php');
+                    $error = true;
+                    header('Location: process_post.php');
                 }else
                 {
-                    $query = "INSERT INTO users (username, password) values (:username, :password)";
+                    $error = false;
+                    $query = "INSERT INTO users (username, password, email) values (:username, :password, :email)";
                     $statement = $db->prepare($query);
                     $statement->bindValue(':username', $name);
                     $statement->bindValue(':password', password_hash($password, PASSWORD_BCRYPT));
+                    $statement->bindValue(':email', $email);
                     $statement->execute();
-                    $_SESSION['user'] = [ 'user' => $name, 'pass' => $password];
+                    $_SESSION['loggedin'] = true;
+                    $_SESSION['username'] = $name;
                     header('Location: index.php');
                 }
             }
@@ -127,6 +179,10 @@
     <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body>
-
+    <?php if($error): ?>
+    <div id="wrapper">
+        <p>An error has occurred, try to do what you were doing again. <a href="index.php">Return</a></p>
+    </div>
+    <?php endif ?>
 </body>
 </html>

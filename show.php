@@ -1,5 +1,6 @@
 <?php
-    require 'connect.php';
+	require 'connect.php';
+	session_start();
 
     function find ($id)
         {
@@ -43,14 +44,15 @@
 			</div>
 			<div id="all_blogs">
 				<div class="blog_post">
-					<h2><?= $post['title'] ?></h2>
+				<?php if (isset($_SESSION['loggedin'])): ?>
+					<a href="edit.php?id=<?= $post['postid'] ?>">Edit this post!</a>
+				<?php endif ?>
 					<div class="blog_content">
-						    <?php foreach (preg_split('/(\n|\r\n)/', $post['description']) as $para): ?>
+					<h2><?= $post['title'] ?></h2>
 						      <p>
-						        <?=$para?>
+						        <?=$post['description']?>
 						      </p>
-						    <?php endforeach; ?>
-                        <a href="search.php?=<?= $post['genre'] ?>"><?= $post['genre'] ?></a>
+                        <a href="search.php?genre=<?= $post['genre'] ?>"><?= $post['genre'] ?></a>
 					</div>
 				</div>
 			</div>

@@ -2,11 +2,16 @@
     $category = false;
     $result = false;
 
+    session_start();
+
     if(isset($_GET['s']))
     {
         $string = filter_input(INPUT_GET, 's', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-        if(isset($_GET['categories']))
+        if(isset($_GET['id']))
+        {
+            
+        }
     }
 ?>
 
@@ -23,7 +28,8 @@
         <div id="wrapper">
             <?php include 'header.php'; ?>
             <div id="content">
-
+                <?php if (count($results) > 0): ?>
+                    <?php if (isset($_GET['id']))
             </div>
         </div>
         <?php include 'footer.php'; ?>
