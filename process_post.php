@@ -11,7 +11,7 @@
     {
         if($_POST['command'] == 'Create')
         {
-            if(!empty(trim($_POST['title'])))
+            if(!empty($_POST['title']))
             {
                 function file_upload_path($original_filename, $upload_subfolder_name = 'images')
                 {
@@ -40,7 +40,7 @@
 
                 $query = "SELECT userid FROM users where username = :username";
                 $values = $db->prepare($query);
-                $values->bindValue(':username', $_SESSION['user']['name']);
+                $values->bindValue(':username', $_SESSION['username']);
                 $values->execute();
                 $row = $values->fetch();
 
@@ -57,9 +57,7 @@
                     $statement->bindValue(':genre', $genre);
                     $statement->execute();
                 }
-
                 header('Location: index.php');
-
             }
             else
             {
@@ -69,19 +67,20 @@
 
         if($_POST['command'] == 'Login')
         {
-            if(!empty(trim($_POST['name'])))
+            if(!empty($_POST['username']))
             {
-                $name         = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $name         = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 $password     = $_POST['password'];
-                $query = "SELECT username, password FROM users WHERE username = (:name)";
+                $query = "SELECT username, password FROM users WHERE username = :username";
                 $values = $db->prepare($query);
-                $values->bindValue(':name', $name);
+                $values->bindValue(':username', $name);
                 $values->execute();
                 $row = $values->fetch();
                 if($name == $row['username'] && password_verify($password, $row['password']))
                 {
                     $_SESSION['username'] = $name;
                     $_SESSION['loggedin'] = true;
+                    $_SESSION['userid'] = $row['userid'];
                     header('Location: index.php');
                 }
                 else
@@ -89,6 +88,7 @@
                     $error = true;
                 }
             }
+            $error = true;
         }
 
         if($_POST['command'] == 'Logout')
@@ -181,7 +181,7 @@
 <body>
     <?php if($error): ?>
     <div id="wrapper">
-        <p>An error has occurred, try to do what you were doing again. <a href="index.php">Return</a></p>
+        <p><a href="index.php">An error has occurred, click here to return to the home page. </a></p>
     </div>
     <?php endif ?>
 </body>
