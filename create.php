@@ -14,10 +14,10 @@
         <div id="wrapper">
             <?php include 'header.php'; ?>
                 <div id="content">
-                    <form action="process_post.php" method="post" class="createform" enctype="multipart/form-data">
-                        <input type="hidden" name="action" value="submit" />
+                    <form action="process_post.php" method="post" class="createform" enctype="multipart/form-data"> 
                         <fieldset class="createreview">
                             <div class="create">
+                            <input type="hidden" name="username" value="<?=$_SESSION['username']?>" />
                             <p>
                                 <label for="title">Title</label>
                                 <input name="title" id="title" />
@@ -30,10 +30,6 @@
                                 <label for="genre">Genre</label>
                                 <input name="genre" id="genre" />
                             </p>                               
-                            <p>
-                                <label for="gameimage">Image</label>
-                                <input type="file" name="image">
-                            </p> 
                             <p>
                                 <input type="submit" name="command" value="Create" />
                             </p>

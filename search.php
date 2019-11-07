@@ -1,18 +1,15 @@
 <?php
-    $category = false;
-    $result = false;
-
     session_start();
+    $error= false;
 
-    if(isset($_GET['s']))
+    if(isset($_POST['search']))
     {
-        $string = filter_input(INPUT_GET, 's', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-        if(isset($_GET['id']))
-        {
-            
-        }
+    }else
+    {
+        $error = true;
     }
+
 ?>
 
 <!DOCTYPE html>
@@ -25,13 +22,16 @@
         <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
     </head>
     <body>
+        <?php if(!$error): ?>
         <div id="wrapper">
             <?php include 'header.php'; ?>
             <div id="content">
-                <?php if (count($results) > 0): ?>
-                    <?php if (isset($_GET['id']))
+                <p>Work in progress. <a href="index.php">Go home!</a></p>
             </div>
         </div>
+        <?php else: ?>
+            <p>Error!</p>
+        <?php endif ?>
         <?php include 'footer.php'; ?>
 
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

@@ -30,3 +30,15 @@ body{
 {
     text-align: center;
 }
+
+.h1 .text-center{
+    color: white;
+}
+
+.dropdown{
+    list-style: none;
+}
+
+.p .text-center{
+    font-size: 300px;
+}

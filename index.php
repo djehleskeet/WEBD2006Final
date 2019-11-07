@@ -2,9 +2,10 @@
     require 'connect.php';
     session_start();
 
-    $query = "SELECT p.title, p.description, p.date_created, p.genre, p.postid, u.username FROM posts p JOIN users u ON p.userid = u.userid ORDER BY p.date_created DESC LIMIT 10";
+    $query = "SELECT p.title, p.description, p.date_created, p.genre, p.postid, u.username, p.userid FROM posts p JOIN users u ON p.userid = u.userid ORDER BY p.date_created DESC LIMIT 10";
     $values = $db->prepare($query);
     $values->execute();
+
 ?>
 
 <!DOCTYPE html>
@@ -19,9 +20,6 @@
         <div id="wrapper">
             <?php include 'header.php'; ?>
             <div id="content">
-                <?php if(isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true): ?>
-                <h1 class="text-center">Welcome <?= $_SESSION['username'] ?>!</h1>
-                <?php endif ?>
                 <?php while ($row = $values->fetch()): ?>
                 <h2 class="font-italic" class="text-dark">
                     <a href="show.php?id=<?=$row['postid']?>"><?=$row['title'] ?></a>
