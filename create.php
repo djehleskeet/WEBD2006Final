@@ -29,7 +29,10 @@
                             <p>
                                 <label for="genre">Genre</label>
                                 <input name="genre" id="genre" />
-                            </p>                               
+                            </p>
+                            <p>
+                                <label for="image">Image</label>
+                                <input type="file" name="image" id="image">                               
                             <p>
                                 <input type="submit" name="command" value="Create" />
                             </p>

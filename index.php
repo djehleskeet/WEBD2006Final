@@ -2,7 +2,7 @@
     require 'connect.php';
     session_start();
 
-    $query = "SELECT p.title, p.description, p.date_created, p.genre, p.postid, u.username, p.userid FROM posts p JOIN users u ON p.userid = u.userid ORDER BY p.date_created DESC LIMIT 10";
+    $query = "SELECT p.title, p.description, p.date_created, p.genre, p.postid, u.username, p.userid, p.imageName FROM posts p JOIN users u ON p.userid = u.userid ORDER BY p.date_created DESC LIMIT 10";
     $values = $db->prepare($query);
     $values->execute();
 
@@ -22,6 +22,7 @@
             <div id="content">
                 <?php while ($row = $values->fetch()): ?>
                 <h2 class="font-italic" class="text-dark">
+                    <img src="./images/<?=$row['imageName']?>">
                     <a href="show.php?id=<?=$row['postid']?>"><?=$row['title'] ?></a>
                 </h2>
                 <p>
