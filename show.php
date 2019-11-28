@@ -5,37 +5,40 @@
     if(isset($_GET['id']))
     {
         $id = filter_input(INPUT_GET, 'id', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-        $query = "SELECT postid, title, description, genre, imageName FROM posts WHERE postid = :id";
+        $query = "SELECT p.postid, p.title, p.description, p.genre, p.imageName, u.username FROM posts p JOIN users u ON p.userid = u.userid WHERE p.postid = :id";
         $values = $db->prepare($query);
         $values->bindValue(':id', $id);
         $values->execute();
     }
+
+    if (empty($_SESSION['username']))
+    {
+    	$_SESSION['username'] = '';
+    }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-        <title>Gamerate</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <link rel="stylesheet" href="style.css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+	<?php include 'header.php'; ?>
 </head>
 <body>
 	<?php if (isset($_GET['id'])): ?>
 		<div id="wrapper">
 			<div id="header">
-                <?php include 'header.php'; ?>
 				<div id="content">
 				<?php while ($row = $values->fetch()): ?>
-					<?php if(isset($_SESSION['loggedin'])): ?>
+					<?php if(isset($_SESSION['admin']) || $row['username'] == $_SESSION['username']): ?>
 						<a href="edit.php?id=<?= $row['postid'] ?>">Edit this post!</a>
 					<?php endif ?>
 					<h2><?= $row['title'] ?></h2>
 					<p>
 						<?= $row['description']?>
 					</p>
-					<a href="search.php?genre=<?= $row['genre'] ?>">Search similar genres like '<?= $row['genre']?>'</a>
+					<?php if (!empty($row['imageName'])): ?>
+						<img src="./images/<?=$row['imageName']?>"alt="<?=$row['title']?>">
+					<?php endif ?>
+					<a href="search.php?search=<?= $row['genre'] ?>">Search similar genres like '<?= $row['genre']?>'</a>
 				<?php endwhile ?>
 				</div>
 			</div>

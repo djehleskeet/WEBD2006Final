@@ -11,7 +11,7 @@
     {
         if($_POST['command'] == 'Create')
         {
-            if(!empty($_POST['title']))
+            if(!empty($_POST['title']) && (!empty($_POST['description'])) && (!empty($_POST['genre'])))
             {
                 $title = filter_input(INPUT_POST, 'title', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -99,7 +99,7 @@
             {
                 $name         = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
                 $password     = $_POST['password'];
-                $query = "SELECT username, password FROM users WHERE username = :username";
+                $query = "SELECT username, password, admin FROM users WHERE username = :username";
                 $values = $db->prepare($query);
                 $values->bindValue(':username', $name);
                 $values->execute();
@@ -109,6 +109,10 @@
                 {
                     $_SESSION['username'] = $name;
                     $_SESSION['loggedin'] = true;
+                    if($row['admin'] == 1)
+                    {
+                        $_SESSION['admin'] = true;
+                    }
                     header('Location: index.php');
                 }
                 else
@@ -205,6 +209,59 @@
                 }
             }
         }
+
+        if($_POST['command'] == 'Delete Image')
+        {
+            $image = filter_input(INPUT_POST, 'image', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $query = "UPDATE posts SET imageName = NULL WHERE imageName = :image";
+            $statement = $db->prepare($query);
+            $statement->bindValue(':image', $image);
+            $statement->execute();
+            unlink('./images/'.$image);
+            header('Location: index.php');
+        }
+
+        if($_POST['command'] == 'Add User')
+        {
+            if (!empty($_POST['username']) || (!empty($_POST['password'])))
+            {
+                $name = filter_input(INPUT_POST, 'createduser', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+
+                $query = "SELECT username FROM users WHERE username = :createduser LIMIT 1";
+                $statement = $db->prepare($query);
+                $statement->bindValue(':createduser', $name);
+                $statement->execute();
+
+                if($statement->rowCount() == 0)
+                {
+                    $query = "INSERT INTO users (username, password, email) values (:createduser, :password, :email)";
+                    $statement = $db->prepare($query);
+                    $statement->bindValue(':createduser', $name);
+                    $statement->bindValue(':password', password_hash($password, PASSWORD_BCRYPT));
+                    $statement->bindValue(':email', $email);
+                    $statement->execute();
+                    $_SESSION['usercreated'] = true;
+                    header('Location: admin.php');
+                }
+                else
+                {
+                    $error = true;
+                }
+            }
+        }
+
+        if($_POST['command'] == 'Delete User')
+        {
+            $userid = filter_input(INPUT_POST, 'userid', FILTER_SANITIZE_NUMBER_INT);
+            $userid = trim($userid);
+            $query = "DELETE FROM users WHERE userid = :userid";
+            $statement = $db->prepare($query);
+            $statement->bindValue(':userid', $userid, PDO::PARAM_INT);
+            $statement->execute();
+            header('Location: admin.php');
+        }
     }
 ?>
 
@@ -218,11 +275,13 @@
 <body>
     <?php if($error): ?>
     <div id="wrapper">
+        <?php include 'header.php'; ?>
         <p><a href="index.php">An error has occurred, click here to return to the home page. </a></p>
     <?php elseif ($upload_error_detected): ?>
         <p>The file you uploaded was not a real file. Try uploading a proper file next time!</p>
     <?php endif ?>    
     </div>
+    <?php include 'footer.php'; ?>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>

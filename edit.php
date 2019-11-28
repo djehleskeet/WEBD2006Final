@@ -16,15 +16,11 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
-        <title>Gamerate</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <link rel="stylesheet" href="style.css">
+      <?php include 'header.php'; ?>
     </head>
     <body>
     <?php if(isset($_SESSION['loggedin'])): ?>
         <div id="wrapper">
-            <?php include 'header.php'; ?>
                 <div id="content">
                 <?php while ($row = $values->fetch()): ?>
                     <form action="process_post.php" method="post" class="editform" enctype="multipart/form-data">
@@ -42,13 +38,20 @@
                             <p>
                                 <label for="genre">Genre:</label>
                                 <input name="genre" id="genre" value="<?=$row['genre']?>"/>
-                            </p>                               
-                            <p>
+                            </p>
                                 <input type="submit" name="command" value="Update" />
                             </p>
                             <p>
                                 <input type="submit" name="command" value="Delete" />
                             </p>
+                                <input type="hidden" name="image" value="<?=$row['imageName']?>" />
+                                <?php if(isset($_SESSION['admin'])): ?>
+                                    <?php if (!empty($row['imageName'])): ?>
+                                    <p>
+                                        <input type="submit" name="command" value="Delete Image" />
+                                    </p>
+                                    <?php endif ?>
+                                <?php endif ?>
 				        </fieldset>
                     </form>
                     <?php endwhile ?>
