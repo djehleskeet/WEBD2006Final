@@ -15,8 +15,8 @@
     $values->execute();
 
     $queryasc = "SELECT p.title, p.description, p.date_created, p.genre, p.postid, u.username, p.userid, p.imageName, u.admin FROM posts p JOIN users u ON p.userid = u.userid ORDER BY p.date_created ASC LIMIT 10";
-    $test = $db->prepare($queryasc);
-    $test->execute();
+    $valuesasc = $db->prepare($queryasc);
+    $valuesasc->execute();
 ?>
 
 <!DOCTYPE html>
@@ -29,7 +29,7 @@
             <div id="content">
             <?php if ($sorted): ?>
             <h1 class="font-weight-bold">Sorted by oldest posts!</h1>
-                <?php while ($row = $test->fetch()): ?>
+                <?php while ($row = $valuesasc->fetch()): ?>
                 <h2 class="font-italic" class="text-dark">
                     <a href="show.php?id=<?=$row['postid']?>"><?=$row['title'] ?></a>
                 </h2>
