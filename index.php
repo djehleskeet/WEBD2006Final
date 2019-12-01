@@ -2,6 +2,14 @@
     require 'connect.php';
     session_start();
 
+    $sorted = false;
+
+    if(isset($_GET['sort']))
+    {
+        $sort = filter_input(INPUT_GET, 'sort', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+        $sorted = true;
+    }
+
     $query = "SELECT p.title, p.description, p.date_created, p.genre, p.postid, u.username, p.userid, p.imageName, u.admin FROM posts p JOIN users u ON p.userid = u.userid ORDER BY p.date_created DESC LIMIT 10";
     $values = $db->prepare($query);
     $values->execute();
@@ -19,7 +27,7 @@
     <body>
         <div id="wrapper">
             <div id="content">
-            <?php if (isset($_GET['sort'])): ?>
+            <?php if ($sorted): ?>
             <h1 class="font-weight-bold">Sorted by oldest posts!</h1>
                 <?php while ($row = $test->fetch()): ?>
                 <h2 class="font-italic" class="text-dark">

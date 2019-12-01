@@ -1,7 +1,6 @@
 <?php
     require 'connect.php';
     session_start();
-    $error = false;
 
     if(isset($_GET['search']))
     {
@@ -16,10 +15,6 @@
         $statement->bindValue(':string', $string);
         $statement->execute();
     }
-    else
-    {
-        $error = true;
-    }
 
 ?>
 
@@ -29,14 +24,20 @@
         <?php include 'header.php'; ?>
     </head>
     <body>
-        <?php if(!$error): ?>
         <div id="wrapper">
+        <?php if(!empty($_GET['search'])): ?>
             <div id="content">
                 <ul>
+                <?php if ($row = $statement->fetch() > 1): ?>
                     <?php while ($row = $statement->fetch()): ?>
                        <li><a href="show.php?id=<?=$row['postid']?>"><?=$row['title'] ?></a></li> 
                     <?php endwhile ?>
+                    <?php else: ?>
+                        <a href="index.php">No results found, click here to return to the main page.</a>
+                    <?php endif ?>
                 </ul>
+                    <?php else: ?>
+                        <a href="index.php">You didn't search anything, click here to return to the main page.</a>
                 <?php endif ?>
             </div>
         </div>
